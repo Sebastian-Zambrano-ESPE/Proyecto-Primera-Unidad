@@ -1,0 +1,52 @@
+{
+  "id": "./",
+  "name": "Fútbol Mundo",
+  "short_name": "Fútbol Mundo",
+  "description": "Sigue ligas, partidos, pronósticos gratuitos y juegos de fútbol.",
+  "lang": "es-EC",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#080d1a",
+  "theme_color": "#080d1a",
+  "categories": ["sports", "games", "entertainment"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Pronósticos deportivos",
+      "short_name": "Pronósticos",
+      "url": "./#pronosticos"
+    },
+    {
+      "name": "Trivia de fútbol",
+      "short_name": "Trivia",
+      "url": "./#trivia"
+    },
+    {
+      "name": "Desafío de penales",
+      "short_name": "Penales",
+      "url": "./#penales"
+    }
+  ]
+}

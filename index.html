@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#080d1a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Fútbol Mundo">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <meta name="description" content="Fútbol Mundo: explora LigaPro, las grandes ligas, sus equipos, jugadores, estadísticas y noticias.">
   <title>Fútbol Mundo — El fútbol no tiene fronteras</title>
   <style>
@@ -78,6 +85,9 @@
     }
     .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 10px rgba(244,209,91,.7); }
     .demo-badge { color: var(--yellow); background: rgba(244,209,91,.10); }
+    .refresh-button { min-height: 34px; padding: 0 10px; font-size: 10px; }
+    .refresh-button svg { width: 14px; height: 14px; }
+    .refresh-button:disabled { cursor: progress; opacity: .65; }
     .menu-button { display: none; border: 0; background: transparent; padding: 8px; cursor: pointer; }
 
     .hero {
@@ -251,7 +261,18 @@
     .feature-card > p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
     .quiz-options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
     .quiz-option { padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.035); color: #dce5dc; font-size: 10px; cursor: pointer; transition: .2s ease; }
-    .quiz-option:hover { border-color: var(--green); color: var(--green); }
+    .quiz-option:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+    .quiz-option:disabled { cursor: default; opacity: .75; }
+    .quiz-option.correct { border-color: var(--green); background: rgba(195,255,90,.12); color: var(--green); }
+    .quiz-option.incorrect { border-color: var(--red); background: rgba(255,116,104,.1); color: #ffaaa2; }
+    .quiz-status { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 17px; }
+    .quiz-status span { padding: 7px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 9px; }
+    .quiz-status strong { color: var(--green); }
+    .quiz-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+    .quiz-controls .trivia-select { margin: 0; }
+    .quiz-level-label { color: var(--muted); font-size: 9px; font-weight: 750; }
+    .quiz-progress { height: 5px; margin: 12px 0 18px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.08); }
+    .quiz-progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--green); transition: width .2s ease; }
     .quiz-result { min-height: 18px; margin-top: 13px; color: var(--green); font-size: 10px; }
     .predict-score { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
     .predict-side { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 7px; color: var(--muted); font-size: 10px; text-align: center; }
@@ -329,7 +350,10 @@
     .world-team-stats span { display: block; margin-top: 3px; color: var(--muted); font-size: 8px; }
     .world-detail-card h4, .leaders-card h4 { margin: 0 0 9px; font-size: 11px; }
     .fixture-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 7px; padding: 9px 0; border-top: 1px solid var(--line); }
-    .fixture-row:first-of-type { border-top: 0; }
+    .fixture-entry { padding: 9px 0; border-top: 1px solid var(--line); }
+    .fixture-entry:first-child { border-top: 0; }
+    .fixture-entry .fixture-row { padding: 4px 0 0; border: 0; }
+    .fixture-competition { color: var(--green); font-size: 8px; font-weight: 750; letter-spacing: .04em; }
     .fixture-list { max-height: 390px; overflow: auto; }
     .fixture-side { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 9px; }
     .fixture-side:last-child { justify-content: flex-end; text-align: right; }
@@ -355,6 +379,17 @@
     .world-message.error { color: #ffb1a9; }
     .world-retry { margin-top: 13px; }
     .penalty-arena { display: grid; grid-template-columns: minmax(0, 1fr) 230px; gap: 15px; align-items: stretch; margin-bottom: 13px; }
+    .penalty-setup { grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 17px 0; }
+    .penalty-setup label { display: grid; gap: 7px; color: var(--muted); font-size: 10px; font-weight: 750; }
+    .penalty-setup select { width: 100%; min-height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: #0c1710; color: var(--text); font: inherit; }
+    .penalty-setup small { min-height: 12px; color: var(--muted); font-size: 8px; font-weight: 500; line-height: 1.4; }
+    .penalty-match-info { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .penalty-match-info span { padding: 7px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 9px; }
+    .penalty-match-info strong { color: var(--green); }
+    .penalty-data-status { min-height: 14px; margin: 0 0 8px; color: var(--muted); font-size: 9px; }
+    .penalty-arena.is-shooting .keeper { filter: drop-shadow(0 3px 7px rgba(195,255,90,.5)); }
+    .penalty-arena.is-goal .goal-frame { border-color: var(--green); box-shadow: 0 0 18px rgba(195,255,90,.45); }
+    .penalty-arena.is-save .goal-frame { border-color: var(--red); }
     .penalty-pitch {
       position: relative; overflow: hidden; min-height: 215px; display: grid; place-items: center;
       border: 1px solid rgba(182,243,107,.15); border-radius: 14px;
@@ -370,9 +405,15 @@
     .ball.shot-left { animation: shot-left .55s ease-out forwards; }
     .ball.shot-center { animation: shot-center .55s ease-out forwards; }
     .ball.shot-right { animation: shot-right .55s ease-out forwards; }
+    .ball.shot-miss-left { animation: shot-miss-left .55s ease-out forwards; }
+    .ball.shot-miss-center { animation: shot-miss-center .55s ease-out forwards; }
+    .ball.shot-miss-right { animation: shot-miss-right .55s ease-out forwards; }
     @keyframes shot-left { to { top: 66px; left: 31%; transform: translate(-50%,-50%) scale(.65); opacity: 1; } }
     @keyframes shot-center { to { top: 65px; left: 50%; transform: translate(-50%,-50%) scale(.65); opacity: 1; } }
     @keyframes shot-right { to { top: 66px; left: 69%; transform: translate(-50%,-50%) scale(.65); opacity: 1; } }
+    @keyframes shot-miss-left { to { top: 29px; left: 12%; transform: translate(-50%,-50%) scale(.7) rotate(-35deg); opacity: 1; } }
+    @keyframes shot-miss-center { to { top: 2px; left: 50%; transform: translate(-50%,-50%) scale(.7); opacity: 1; } }
+    @keyframes shot-miss-right { to { top: 29px; left: 88%; transform: translate(-50%,-50%) scale(.7) rotate(35deg); opacity: 1; } }
     .penalty-scoreboard { display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 13px; background: rgba(255,255,255,.025); }
     .penalty-scoreboard span { color: var(--muted); font-size: 9px; }
     .penalty-scoreboard strong { font-size: 23px; letter-spacing: -.04em; }
@@ -382,6 +423,7 @@
     .shot-button:hover:not(:disabled) { border-color: var(--green); color: var(--green); transform: translateY(-1px); }
     .shot-button:disabled { opacity: .5; cursor: wait; }
     .penalty-message { min-height: 18px; margin-top: 11px; color: var(--green); font-size: 10px; text-align: center; }
+    .penalty-message.is-result { font-size: 12px; font-weight: 800; }
     .team-detail { margin-top: 30px; }
     .detail-header { background-image: linear-gradient(115deg, rgba(182,243,107,.07), transparent 60%); }
     .roster-link { margin: 0 0 16px 18px; }
@@ -429,7 +471,7 @@
     .player-stat strong { white-space: nowrap; }
     .trivia-section { margin: 48px 0 20px; }
     .trivia-card { min-height: 0; max-width: 760px; }
-    .trivia-select { max-width: 280px; margin-bottom: 20px; }
+    .trivia-select { max-width: 280px; }
     .trivia-card h3 { margin: 0; font-size: 17px; }
     #quiz-next { margin-top: 7px; }
     .features#penales { grid-template-columns: minmax(0, 1fr); margin-top: 28px; }
@@ -471,6 +513,8 @@
       .nav a { padding: 12px 8px; font-size: 13px; }
       .nav-right { margin-left: auto; }
       .live-badge { display: none; }
+      .refresh-button { width: 34px; padding: 0; }
+      .refresh-button span { display: none; }
       .menu-button { display: block; }
       .hero { min-height: 385px; margin-top: 17px; background-position: 58% center; }
       .hero::after { right: -210px; opacity: .5; }
@@ -532,9 +576,10 @@
       .world-detail { grid-template-columns: 1fr; }
       .penalty-arena { grid-template-columns: 1fr; }
       .penalty-pitch { min-height: 190px; }
-      .penalty-scoreboard { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; }
+      .penalty-scoreboard { display: grid; grid-template-columns: repeat(5, 1fr); text-align: center; }
       .penalty-scoreboard .money-note { grid-column: 1 / -1; }
       .player-controls { grid-template-columns: 1fr; padding: 12px; }
+      .player-controls.penalty-setup { grid-template-columns: 1fr 1fr; }
       .player-feature { padding: 17px; }
       .player-feature-photo, .player-photo-fallback { width: 58px; height: 58px; }
       .player-feature h3 { font-size: 15px; }
@@ -558,6 +603,66 @@
     .brand-name { color: var(--text); }
     .nav { gap: clamp(14px, 2vw, 29px); }
     .nav a { color: #b6c1d5; }
+    .menu-wrap { position: static; margin-left: auto; }
+    .menu-button {
+      display: flex; align-items: center; gap: 9px; min-height: 39px; padding: 0 13px;
+      border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.055);
+      color: var(--text); font-size: 11px; font-weight: 750;
+    }
+    .menu-button:hover, .menu-button[aria-expanded="true"] { border-color: rgba(195,255,90,.45); color: var(--green); }
+    .menu-button svg { width: 17px; height: 17px; }
+    .nav {
+      display: none; position: absolute; z-index: 25; top: calc(100% + 13px); right: 0;
+      width: min(660px, calc(100vw - 48px)); margin: 0; padding: 13px;
+      grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;
+      border: 1px solid var(--line); border-radius: 17px;
+      background: rgba(15,24,42,.98); box-shadow: 0 22px 65px rgba(0,0,0,.4);
+      backdrop-filter: blur(18px);
+    }
+    .nav.open { display: grid; }
+    .menu-group { display: grid; align-content: start; gap: 5px; padding: 8px; }
+    .menu-group strong { padding: 4px 8px 7px; color: var(--green); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+    .menu-group a { padding: 9px 8px; border-radius: 9px; color: #c5cfe0; font-size: 11px; }
+    .menu-group a:hover { background: rgba(255,255,255,.06); color: var(--text); }
+    .home-shortcuts { margin: 20px 0 28px; }
+    .home-shortcuts h2 { margin: 0 0 12px; font-size: 15px; letter-spacing: -.025em; }
+    .shortcut-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .shortcut-card {
+      display: flex; flex-direction: column; min-height: 112px; padding: 15px;
+      border: 1px solid var(--line); border-radius: 15px; background: rgba(16,24,42,.82);
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .shortcut-card:hover { transform: translateY(-2px); border-color: rgba(112,220,255,.35); background: var(--panel-raised); }
+    .shortcut-card strong { font-size: 12px; }
+    .shortcut-card span { margin-top: 7px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .shortcut-card.primary { border-color: rgba(195,255,90,.3); background: linear-gradient(145deg, rgba(195,255,90,.09), rgba(16,24,42,.9)); }
+    .prediction-section { margin: 32px 0 48px; }
+    .prediction-notice { margin: 0 0 14px; color: var(--muted); font-size: 10px; line-height: 1.6; }
+    .prediction-controls { display: flex; align-items: end; gap: 12px; margin-bottom: 14px; }
+    .prediction-controls label { display: grid; gap: 6px; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .prediction-controls select {
+      min-width: 220px; min-height: 38px; padding: 0 11px; border: 1px solid var(--line);
+      border-radius: 10px; background: var(--panel); color: var(--text);
+    }
+    .prediction-count { margin-left: auto; color: var(--muted); font-size: 10px; }
+    .prediction-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .prediction-match { padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: var(--panel); }
+    .prediction-match-heading { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 9px; }
+    .prediction-matchup { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin: 14px 0; font-size: 11px; font-weight: 750; }
+    .prediction-matchup span:first-child { text-align: left; }
+    .prediction-matchup span:last-child { text-align: right; }
+    .prediction-vs { color: var(--green); font-size: 9px; }
+    .prediction-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+    .prediction-options button {
+      min-height: 37px; border: 1px solid var(--line); border-radius: 9px;
+      background: rgba(255,255,255,.035); color: #c5cfe0; font-size: 10px; cursor: pointer;
+    }
+    .prediction-options button:hover, .prediction-options button[aria-pressed="true"] {
+      border-color: rgba(195,255,90,.55); background: rgba(195,255,90,.1); color: var(--green);
+    }
+    .prediction-choice { min-height: 15px; margin: 9px 0 0; color: var(--muted); font-size: 9px; }
+    .prediction-message { grid-column: 1 / -1; padding: 20px; border: 1px solid var(--line); border-radius: 14px; color: var(--muted); font-size: 11px; }
+    .prediction-message.error { color: #ffaaa2; }
     .live-badge, .demo-badge { border: 1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.045); }
     .live-dot { background: var(--green); box-shadow: 0 0 12px rgba(195,255,90,.8); animation: breathe 2s ease-in-out infinite; }
     .hero {
@@ -611,6 +716,28 @@
       .hero-actions { flex-wrap: wrap; }
       .nav-right .live-badge { display: none; }
     }
+    @media (max-width: 760px) {
+      .shortcut-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 650px) {
+      .menu-wrap { position: static; margin-left: auto; }
+      .nav {
+        top: calc(100% + 12px); right: 0; left: auto; width: min(390px, calc(100vw - 30px));
+        padding: 11px; grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .nav-right { margin-left: 10px; }
+      .menu-button { display: flex; }
+      .prediction-list { grid-template-columns: 1fr; }
+      .prediction-controls { align-items: stretch; flex-direction: column; }
+      .prediction-controls select { width: 100%; }
+      .prediction-count { margin-left: 0; }
+    }
+    @media (max-width: 400px) {
+      .menu-button { gap: 6px; padding: 0 9px; font-size: 10px; }
+      .nav { grid-template-columns: 1fr; }
+      .nav-right .demo-badge { display: none; }
+      .shortcut-card { min-height: 102px; padding: 12px; }
+    }
     @media (prefers-reduced-motion: reduce) {
       .hero { animation: none; }
       .hero-content { animation: none; }
@@ -619,38 +746,56 @@
 </head>
 <body>
   <header class="shell topbar">
-    <a class="brand" href="#" aria-label="Fútbol Mundo, inicio">
+    <a class="brand" href="#inicio" aria-label="Fútbol Mundo, inicio">
       <span class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="m12 7 3 2.2-1.1 3.4h-3.8L9 9.2 12 7Zm0 0V3m3 6.2 4.2-1.3M13.9 12.6l2.4 3.7M10.1 12.6l-2.4 3.7M9 9.2 4.8 7.9m2.9 8.4L6 19m10-2.1L18 19" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
       </span>
       <span class="brand-name">Fútbol <span>Mundo</span></span>
     </a>
-    <nav class="nav" id="main-nav" aria-label="Navegación principal">
-      <a href="#equipos">LigaPro</a>
-      <a href="#europa">Ligas europeas</a>
-      <a href="#jugadores">Jugadores</a>
-      <a href="#trivia">Trivia</a>
-      <a href="#noticias">Noticias</a>
-      <a href="#penales">Penales</a>
-    </nav>
+    <div class="menu-wrap">
+      <button class="menu-button" id="menu-button" type="button" aria-label="Abrir menú de opciones" aria-expanded="false" aria-controls="main-nav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Explorar</span>
+      </button>
+      <nav class="nav" id="main-nav" aria-label="Menú principal">
+        <div class="menu-group">
+          <strong>Competiciones</strong>
+          <a href="#equipos">LigaPro Ecuador</a>
+          <a href="#europa">Ligas y Champions</a>
+        </div>
+        <div class="menu-group">
+          <strong>Pronósticos y juegos</strong>
+          <a href="#pronosticos">Pronósticos deportivos</a>
+          <a href="#trivia">Trivia de fútbol</a>
+          <a href="#penales">Desafío de penales</a>
+        </div>
+        <div class="menu-group">
+          <strong>Explorar más</strong>
+          <a href="#jugadores">Jugadores y plantillas</a>
+          <a href="#noticias">Noticias y mercado</a>
+        </div>
+      </nav>
+    </div>
     <div class="nav-right">
-      <span class="live-badge"><span class="live-dot"></span> Datos actualizados</span>
+      <span class="live-badge" title="Los datos de ESPN se actualizan automáticamente cada 5 minutos mientras esta página está abierta."><span class="live-dot"></span> Actualización automática</span>
       <span class="demo-badge" id="feed-status">Conectando</span>
-      <button class="menu-button" id="menu-button" aria-label="Abrir navegación" aria-expanded="false">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <button class="button secondary refresh-button" id="refresh-data" type="button" aria-label="Actualizar todos los datos" title="Actualizar todos los datos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"/></svg><span>Actualizar</span>
       </button>
     </div>
   </header>
 
   <main class="shell">
-    <section class="hero" aria-labelledby="hero-title">
+    <section class="hero" id="inicio" aria-labelledby="hero-title">
       <div class="hero-content">
         <div class="hero-kicker">El fútbol no tiene fronteras</div>
         <h1 id="hero-title">Un planeta.<br><span>Un solo fútbol.</span></h1>
-        <p class="hero-copy">Tu punto de encuentro con LigaPro, las grandes ligas de Europa y la Champions. Equipos, jugadores, noticias y estadísticas en una experiencia hecha para vivir cada partido.</p>
+        <p class="hero-copy">Tu punto de encuentro con LigaPro, las grandes ligas, sus jugadores y noticias. Sigue los partidos, prueba tus pronósticos y vive el fútbol en un solo lugar.</p>
         <div class="hero-actions">
-          <a class="button" href="#equipos">Descubrir LigaPro <span aria-hidden="true">→</span></a>
-          <a class="button secondary" href="#europa">Viajar a Europa</a>
+          <a class="button" href="#pronosticos">Hacer un pronóstico <span aria-hidden="true">→</span></a>
+          <a class="button secondary" href="#equipos">Explorar LigaPro</a>
+          <a class="button secondary" href="#europa">Ver competiciones</a>
+          <button class="button secondary" id="install-app" type="button">Instalar app</button>
+          <button class="button secondary" id="share-app" type="button">Compartir app</button>
         </div>
       </div>
       <div class="hero-art" aria-hidden="true">
@@ -662,8 +807,41 @@
 
     <aside class="notice" role="note">
       <svg class="notice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01" stroke-linecap="round"/></svg>
-      <div><strong>Fuentes visibles:</strong> Serie A de Ecuador usa el corte de LigaPro consultado el 28 de octubre de 2026; no se actualiza en vivo. Las ligas europeas muestran clasificaciones publicadas por ESPN. Plantillas, fotos y estadísticas individuales provienen de ESPN y pueden no estar disponibles para todos los jugadores. <a class="text-link" href="https://ligapro.ec/" target="_blank" rel="noopener noreferrer">LigaPro oficial</a>.</div>
+      <div><strong>Fuentes visibles:</strong> tablas, calendarios, plantillas, estadísticas y noticias consultados a ESPN se actualizan automáticamente cada cinco minutos y también desde el botón “Actualizar”. La tabla de LigaPro se calcula con los resultados publicados por ESPN. Los datos pueden cambiar cuando la fuente publique correcciones.</div>
     </aside>
+
+    <section class="home-shortcuts" aria-labelledby="shortcuts-heading">
+      <h2 id="shortcuts-heading">¿Qué quieres hacer?</h2>
+      <div class="shortcut-grid">
+        <a class="shortcut-card primary" href="#pronosticos"><strong>Pronósticos deportivos</strong><span>Elige tu resultado para los próximos partidos, sin dinero real.</span></a>
+        <a class="shortcut-card" href="#equipos"><strong>LigaPro Ecuador</strong><span>Consulta grupos, posiciones y próximos partidos por equipo.</span></a>
+        <a class="shortcut-card" href="#europa"><strong>Ligas internacionales</strong><span>Explora tablas, equipos y calendarios por competición.</span></a>
+        <a class="shortcut-card" href="#jugadores"><strong>Jugadores</strong><span>Busca plantillas y consulta perfiles de los futbolistas.</span></a>
+        <a class="shortcut-card" href="#trivia"><strong>Trivia</strong><span>Responde preguntas en distintos niveles.</span></a>
+        <a class="shortcut-card" href="#penales"><strong>Juego de penales</strong><span>Elige competición, equipo, jugador y dificultad.</span></a>
+        <a class="shortcut-card" href="#noticias"><strong>Noticias</strong><span>Lee titulares y novedades del fútbol.</span></a>
+      </div>
+    </section>
+
+    <section class="prediction-section" id="pronosticos" aria-labelledby="prediction-heading">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">Tu jugada · solo por diversión</div>
+          <h2 id="prediction-heading">Pronósticos deportivos</h2>
+          <p>Predice el resultado de los próximos partidos de tus competiciones favoritas.</p>
+        </div>
+      </div>
+      <p class="prediction-notice">Elige 1 (gana el local), X (empate) o 2 (gana el visitante). Es una dinámica gratuita de afición: no incluye apuestas, premios ni dinero real.</p>
+      <div class="prediction-controls">
+        <label for="prediction-competition">Competición
+          <select id="prediction-competition" aria-label="Selecciona una competición para pronosticar"></select>
+        </label>
+        <span class="prediction-count" id="prediction-count" aria-live="polite">Aún no has hecho pronósticos.</span>
+      </div>
+      <div class="prediction-list" id="prediction-list" aria-live="polite">
+        <div class="prediction-message">Cargando próximos partidos…</div>
+      </div>
+    </section>
 
     <section id="equipos" aria-labelledby="teams-heading">
       <div class="section-heading">
@@ -687,7 +865,7 @@
             <tbody id="standings-body"></tbody>
           </table>
         </div>
-        <p class="standings-source" id="ecuador-standings-source">Corte consultado: 28 oct 2026 · <a class="text-link" href="https://ligapro.ec/" target="_blank" rel="noopener noreferrer">LigaPro oficial</a> · No es una actualización en vivo.</p>
+        <p class="standings-source" id="ecuador-standings-source">Cargando resultados publicados por ESPN para actualizar la tabla…</p>
       </div>
       <div class="club-toolbar">
         <span class="club-count" id="club-count" aria-live="polite"></span>
@@ -732,7 +910,7 @@
       <div class="world-card" id="world-card" aria-live="polite">
         <div class="world-message">Conectando con el proveedor de resultados…</div>
       </div>
-      <p class="world-footnote">Puntos, posiciones y desempates se leen directamente de la clasificación publicada por ESPN para la temporada vigente; no se recalculan a partir de los marcadores. Las horas de los partidos están en hora de Ecuador. Fuente: ESPN. Los escudos pertenecen a sus respectivos clubes.</p>
+      <p class="world-footnote">Tablas, calendarios, estadísticas y noticias de ESPN se actualizan automáticamente cada 5 minutos mientras la página está abierta. La tabla de LigaPro Ecuador muestra el corte indicado y no forma parte de esa actualización automática. Las horas de los partidos están en hora de Ecuador.</p>
     </section>
 
     <section id="jugadores" class="player-explorer" aria-labelledby="players-heading">
@@ -759,28 +937,60 @@
     <section id="trivia" class="trivia-section" aria-labelledby="trivia-heading">
       <div class="section-heading">
         <div>
-          <div class="eyebrow">Reto Fútbol Mundo · datos de la liga</div>
-          <h2 id="trivia-heading">Trivia, liga por liga</h2>
-          <p>La pregunta cambia según la competición seleccionada y su clasificación.</p>
+          <div class="eyebrow">Reto Fútbol Mundo · pon a prueba tus conocimientos</div>
+          <h2 id="trivia-heading">Trivia de fútbol</h2>
+          <p>Elige una dificultad y responde 10 preguntas distintas. Cada acierto suma un punto.</p>
         </div>
       </div>
       <article class="feature-card trivia-card">
-        <label class="trivia-select">Jugar con
-          <select id="trivia-competition" aria-label="Selecciona la liga para la trivia"></select>
-        </label>
-        <h3 id="quiz-question">Cargando pregunta…</h3>
+        <div class="quiz-controls">
+          <label class="trivia-select"><span class="quiz-level-label">Dificultad</span>
+            <select id="trivia-difficulty" aria-label="Selecciona la dificultad de la trivia">
+              <option value="facil">Fácil</option>
+              <option value="medio">Medio</option>
+              <option value="dificil">Difícil</option>
+            </select>
+          </label>
+          <button class="button secondary" id="quiz-restart" type="button">Nueva ronda</button>
+        </div>
+        <div class="quiz-status" aria-live="polite">
+          <span id="quiz-counter">Pregunta <strong>1</strong> de 10</span>
+          <span id="quiz-score">Puntaje: <strong>0</strong></span>
+          <span id="quiz-league-status">Preguntas de fútbol</span>
+        </div>
+        <div class="quiz-progress" role="progressbar" aria-label="Progreso de la ronda" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><span id="quiz-progress-fill"></span></div>
+        <span class="quiz-league" id="quiz-league"></span>
+        <h3 id="quiz-question">Preparando preguntas…</h3>
         <div class="quiz-options" id="quiz-options"></div>
         <div class="quiz-result" id="quiz-result" aria-live="polite"></div>
-        <button class="button secondary hidden" id="quiz-next" type="button">Otra pregunta</button>
+        <button class="button secondary hidden" id="quiz-next" type="button">Siguiente pregunta</button>
       </article>
     </section>
 
     <section class="features" id="penales" aria-label="Juego de penales">
       <article class="feature-card">
         <div class="eyebrow">Reto Fútbol Mundo · solo por diversión</div>
-        <h2>La tanda de penales</h2>
-        <p>Patea, intenta engañar al arquero y suma puntos de juego. Sin apuestas, pagos ni premios en dinero real.</p>
-        <div class="penalty-arena">
+        <h2>Desafío de penales</h2>
+        <p>Elige tu liga, equipo y goleador. Supera cinco lanzamientos y desafía al arquero en cuatro niveles.</p>
+        <div class="player-controls penalty-setup">
+          <label>País o competición<select id="penalty-competition" aria-label="Elige el país o competición para el desafío"></select></label>
+          <label>Equipo<select id="penalty-team" aria-label="Elige el equipo del desafío"></select></label>
+          <label>Goleador<select id="penalty-player" aria-label="Elige el jugador que patea"></select></label>
+          <label>Dificultad<select id="penalty-difficulty" aria-label="Elige la dificultad del arquero">
+            <option value="aficionado">Aficionado</option>
+            <option value="competitivo">Competitivo</option>
+            <option value="profesional">Profesional</option>
+            <option value="leyenda">Leyenda</option>
+          </select><small id="penalty-difficulty-hint"></small></label>
+        </div>
+        <div class="penalty-match-info" aria-live="polite">
+          <span>Equipo: <strong id="penalty-team-label">Cargando…</strong></span>
+          <span>Jugador: <strong id="penalty-player-label">Selecciona un jugador</strong></span>
+          <span>Nivel: <strong id="penalty-level-label">Aficionado</strong></span>
+          <span id="penalty-round">Tiro: <strong>0</strong> / 5</span>
+        </div>
+        <p class="penalty-data-status" id="penalty-data-status" aria-live="polite"></p>
+        <div class="penalty-arena" id="penalty-arena">
           <div class="penalty-pitch" id="penalty-pitch" aria-label="Cancha de penales">
             <div class="goal-frame" aria-hidden="true"></div>
             <div class="keeper center" id="penalty-keeper" aria-hidden="true">🧤</div>
@@ -789,17 +999,20 @@
           <div class="penalty-scoreboard">
             <div><span>Puntos ficticios</span><strong id="penalty-points">0</strong></div>
             <div><span>Goles</span><strong id="penalty-goals">0</strong></div>
-            <div><span>Intentos</span><strong id="penalty-attempts">0</strong></div>
+            <div><span>Tiros</span><strong id="penalty-attempts">0</strong></div>
+            <div><span>Atajadas</span><strong id="penalty-saves">0</strong></div>
+            <div><span>Fuera</span><strong id="penalty-misses">0</strong></div>
+            <div><span>Racha</span><strong id="penalty-streak">0</strong></div>
             <span class="money-note">Monedas de juego sin valor real. No se puede apostar, comprar, retirar ni canjear.</span>
           </div>
         </div>
         <div class="penalty-controls" id="penalty-controls">
-          <button class="shot-button" data-shot="left">Patear a la izquierda</button>
-          <button class="shot-button" data-shot="center">Patear al centro</button>
-          <button class="shot-button" data-shot="right">Patear a la derecha</button>
-          <button class="shot-button" id="penalty-reset">Reiniciar tanda</button>
+          <button class="shot-button" data-shot="left">Tirar a la izquierda</button>
+          <button class="shot-button" data-shot="center">Tirar al centro</button>
+          <button class="shot-button" data-shot="right">Tirar a la derecha</button>
+          <button class="shot-button" id="penalty-reset">Empezar de nuevo</button>
         </div>
-        <div class="penalty-message" id="penalty-message" aria-live="polite">Elige dónde patear para comenzar.</div>
+        <div class="penalty-message" id="penalty-message" aria-live="polite">Elige tu equipo y jugador para comenzar.</div>
       </article>
     </section>
 
@@ -836,7 +1049,7 @@
   <footer>
     <div class="shell footer-row">
       <span>© 2026 Fútbol Mundo · El fútbol no tiene fronteras.</span>
-      <span>Estadísticas ESPN · LigaPro con corte consultado el 28 oct 2026.</span>
+      <span>Datos deportivos consultados a ESPN · actualización automática cada 5 minutos.</span>
     </div>
   </footer>
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
@@ -909,6 +1122,7 @@
     };
 
     const state = { group: "a-title", club: clubs.a[0], panel: "resumen" };
+    const ecuadorStandingsState = { updatedAt: null, error: "" };
     const grid = document.getElementById("team-grid");
     const search = document.getElementById("team-search");
     const detailContent = document.getElementById("detail-content");
@@ -922,6 +1136,12 @@
       { id: "uefa.champions", name: "Champions League", country: "Europa", flag: "🏆", short: "UCL" }
     ];
     const worldState = { active: "eng.1", selectedTeam: null, data: new Map() };
+    const predictionState = { competitionId: "ecu.1", ecuadorEvents: [], picks: new Map() };
+    const refreshState = { intervalMs: 5 * 60 * 1000, lastStartedAt: 0, inFlight: null };
+    const refreshingCompetitions = new Set();
+    let playerRefreshError = "";
+    let newsRefreshError = "";
+    let newsHasLoaded = false;
     const ecuadorTeamIds = {
       "Aucas": "6017",
       "Barcelona SC": "2686",
@@ -941,8 +1161,62 @@
       "Universidad Católica": "9283"
     };
     const playerState = { competitionId: "ecu.1", teamId: "17086", roster: [], selectedPlayerId: null, pendingPlayerId: null, statistics: null, loading: false, error: "", requestId: 0 };
-    const triviaState = { competitionId: "ecu.1", questionNumber: 0, answer: null };
-    const penaltyState = { points: 0, goals: 0, attempts: 0 };
+    const triviaQuestions = {
+      facil: [
+        { question: "¿Cuántos jugadores de un equipo hay en la cancha al comenzar un partido?", options: ["9", "10", "11", "12"], answer: 2 },
+        { question: "¿Cuánto dura un partido de fútbol, sin contar el tiempo añadido?", options: ["80 minutos", "90 minutos", "100 minutos", "120 minutos"], answer: 1 },
+        { question: "¿Qué tarjeta indica la expulsión de un jugador?", options: ["Verde", "Amarilla", "Azul", "Roja"], answer: 3 },
+        { question: "¿Qué jugador puede usar las manos dentro de su propia área?", options: ["El capitán", "El arquero", "El defensa central", "Cualquier jugador"], answer: 1 },
+        { question: "¿Cuántos puntos suele recibir un equipo por ganar un partido de liga?", options: ["1", "2", "3", "4"], answer: 2 },
+        { question: "¿Cómo se llama el saque que se realiza desde la esquina del campo?", options: ["Tiro libre", "Saque de meta", "Córner", "Saque lateral"], answer: 2 },
+        { question: "¿Qué parte del cuerpo no puede usar un jugador de campo para tocar el balón?", options: ["Cabeza", "Pecho", "Mano o brazo", "Rodilla"], answer: 2 },
+        { question: "¿Qué ocurre si el balón cruza completamente la línea de gol dentro del arco?", options: ["Es gol", "Es córner", "Es saque lateral", "Sigue el juego"], answer: 0 },
+        { question: "¿Cuántos equipos se enfrentan en un partido de fútbol?", options: ["Uno", "Dos", "Tres", "Cuatro"], answer: 1 },
+        { question: "¿Qué color suele llevar el arquero para distinguirse de sus compañeros?", options: ["El mismo uniforme", "Un uniforme diferente", "Solo blanco", "Solo negro"], answer: 1 },
+        { question: "¿Con qué se reanuda el juego después de que el balón sale por una línea lateral?", options: ["Saque de banda", "Saque de meta", "Córner", "Penal"], answer: 0 },
+        { question: "¿Qué se necesita para marcar un gol válido?", options: ["Que el balón toque el poste", "Que el balón cruce completamente la línea de gol", "Que el arquero toque el balón", "Que el capitán lo confirme"], answer: 1 }
+      ],
+      medio: [
+        { question: "¿En qué país se celebró el primer Mundial masculino, en 1930?", options: ["Brasil", "Italia", "Uruguay", "Argentina"], answer: 2 },
+        { question: "¿Contra qué selección consiguió Ecuador su primera victoria en un Mundial?", options: ["Italia", "Croacia", "México", "Polonia"], answer: 1 },
+        { question: "¿A cuántos metros del arco se encuentra el punto penal?", options: ["9 metros", "10 metros", "11 metros", "12 metros"], answer: 2 },
+        { question: "¿Qué selección ganó el Mundial de 2010?", options: ["Países Bajos", "Alemania", "España", "Brasil"], answer: 2 },
+        { question: "¿Qué selección ganó el Mundial de 2014?", options: ["Argentina", "Alemania", "Francia", "Brasil"], answer: 1 },
+        { question: "¿Qué selección ganó el Mundial de 2018?", options: ["Croacia", "Bélgica", "Francia", "Inglaterra"], answer: 2 },
+        { question: "¿Qué selección ganó el Mundial de 2022?", options: ["Francia", "Argentina", "Marruecos", "Brasil"], answer: 1 },
+        { question: "¿Qué equipo ecuatoriano es conocido como 'El Bombillo'?", options: ["Barcelona SC", "Emelec", "LDU Quito", "El Nacional"], answer: 1 },
+        { question: "¿Qué equipo ecuatoriano juega sus partidos como local en el estadio Rodrigo Paz Delgado?", options: ["Independiente del Valle", "Aucas", "LDU Quito", "Deportivo Cuenca"], answer: 2 },
+        { question: "¿Qué selección ganó la Copa América 2024?", options: ["Colombia", "Brasil", "Argentina", "Uruguay"], answer: 2 },
+        { question: "¿Cuántos árbitros asistentes suelen acompañar al árbitro principal en un partido?", options: ["Uno", "Dos", "Tres", "Cuatro"], answer: 1 },
+        { question: "¿Qué ocurre cuando un jugador recibe dos tarjetas amarillas en el mismo partido?", options: ["Se cambia de equipo", "Es expulsado", "Se cobra un penal", "Termina el partido"], answer: 1 }
+      ],
+      dificil: [
+        { question: "¿Qué selección ha ganado más Mundiales masculinos?", options: ["Alemania", "Italia", "Argentina", "Brasil"], answer: 3 },
+        { question: "¿Qué club ganó la primera Copa de Europa, en la temporada 1955-56?", options: ["Real Madrid", "AC Milan", "Benfica", "Barcelona"], answer: 0 },
+        { question: "¿Qué club ganó la primera edición de la Copa Libertadores, en 1960?", options: ["Santos", "Peñarol", "Boca Juniors", "Olimpia"], answer: 1 },
+        { question: "¿Quién marcó el gol de la victoria de Ecuador ante Croacia en el Mundial de 2002?", options: ["Agustín Delgado", "Iván Kaviedes", "Édison Méndez", "Ulises de la Cruz"], answer: 2 },
+        { question: "¿En qué año debutó Ecuador en una Copa Mundial masculina?", options: ["1998", "2002", "2006", "2010"], answer: 1 },
+        { question: "¿Qué selección fue subcampeona del Mundial de 2022?", options: ["Croacia", "Marruecos", "Francia", "Brasil"], answer: 2 },
+        { question: "¿Qué selección ganó el primer Mundial femenino, en 1991?", options: ["Noruega", "Alemania", "Estados Unidos", "China"], answer: 2 },
+        { question: "¿Qué selección ganó el Mundial masculino de 2006?", options: ["Francia", "Italia", "Alemania", "Brasil"], answer: 1 },
+        { question: "¿Qué equipo ganó la Copa Libertadores de 2008?", options: ["Fluminense", "LDU Quito", "Boca Juniors", "América"], answer: 1 },
+        { question: "¿Qué país organizó el Mundial masculino de 1994?", options: ["México", "Italia", "Estados Unidos", "Francia"], answer: 2 },
+        { question: "¿Qué club ganó la Champions League masculina de 2022-23?", options: ["Inter de Milán", "Manchester City", "Real Madrid", "Bayern Múnich"], answer: 1 },
+        { question: "¿Qué selección ganó el Mundial masculino de 1998?", options: ["Brasil", "Francia", "Italia", "Países Bajos"], answer: 1 }
+      ]
+    };
+    const triviaState = { difficulty: "facil", questions: [], questionNumber: 0, score: 0, answer: null, answered: false, finished: false };
+    const penaltyDifficulty = {
+      aficionado: { label: "Aficionado", anticipation: .35, missChance: .06, points: 10 },
+      competitivo: { label: "Competitivo", anticipation: .5, missChance: .09, points: 15 },
+      profesional: { label: "Profesional", anticipation: .65, missChance: .12, points: 20 },
+      leyenda: { label: "Leyenda", anticipation: .78, missChance: .16, points: 30 }
+    };
+    const penaltyState = {
+      competitionId: "ecu.1", teamId: "17086", players: [], playerId: "", difficulty: "aficionado",
+      points: 0, goals: 0, saves: 0, misses: 0, attempts: 0, streak: 0, busy: false, playersLoading: false,
+      requestId: 0, roundId: 0, error: ""
+    };
 
     function ecuadorEntry(name) {
       for (const [groupKey, group] of Object.entries(ecuadorStandings)) {
@@ -957,14 +1231,100 @@
       document.getElementById("standings-caption").textContent = `Serie A Ecuador 2026 · ${group.label}`;
       document.getElementById("standings-body").innerHTML = group.rows.map((row, index) => `
         <tr class="${row.club === state.club[0] ? "current-row" : ""}">
-          <td>${index + 1}</td><td>${escapeHtml(row.club)}</td><td>${row.played}</td>
+          <td>${row.rank || index + 1}</td><td>${escapeHtml(row.club)}</td><td>${row.played}</td>
           <td>${row.goalDifference > 0 ? "+" : ""}${row.goalDifference}</td><td>${row.points}</td>
         </tr>`).join("");
+      const source = document.getElementById("ecuador-standings-source");
+      if (ecuadorStandingsState.updatedAt) {
+        const updated = new Intl.DateTimeFormat("es-EC", {
+          dateStyle: "medium", timeStyle: "short", timeZone: "America/Guayaquil"
+        }).format(ecuadorStandingsState.updatedAt);
+        source.textContent = ecuadorStandingsState.error
+          ? `No se pudo actualizar la tabla; se conserva la última consulta de ${updated}. ${ecuadorStandingsState.error}`
+          : `Resultados de ESPN consultados: ${updated} · hora Ecuador.`;
+      } else if (ecuadorStandingsState.error) {
+        source.textContent = `No se pudo actualizar la tabla en vivo. Se muestra el último corte disponible. ${ecuadorStandingsState.error}`;
+      }
       document.querySelectorAll(".group-tab").forEach(tab => {
         const active = tab.dataset.group === state.group;
         tab.classList.toggle("active", active);
         tab.setAttribute("aria-selected", String(active));
       });
+    }
+
+    async function refreshEcuadorStandings() {
+      try {
+        const year = new Date().getFullYear();
+        const payload = await fetchJson(`${soccerApi}/ecu.1/scoreboard?dates=${year}&limit=1000`);
+        if (!Array.isArray(payload.events)) throw new Error("ESPN no publicó resultados de LigaPro.");
+        predictionState.ecuadorEvents = payload.events;
+        const teamNames = new Map(Object.entries(ecuadorTeamIds).map(([name, id]) => [String(id), name]));
+        const totals = new Map([...teamNames.keys()].map(id => [id, {
+          played: 0, wins: 0, draws: 0, losses: 0, goalsFor: 0, goalsAgainst: 0, points: 0
+        }]));
+        payload.events.forEach(event => {
+          const match = event.competitions?.[0];
+          const status = match?.status?.type;
+          if (Number(event.season?.year) !== year || status?.completed !== true ||
+              /abandon|cancel|postpon|suspend|forfeit/i.test(status.name || "") ||
+              match.competitors?.length !== 2) return;
+          const [home, away] = match.competitors;
+          const homeId = String(home.team?.id || home.id);
+          const awayId = String(away.team?.id || away.id);
+          const homeStats = totals.get(homeId);
+          const awayStats = totals.get(awayId);
+          const homeScore = Number(home.score?.value ?? home.score);
+          const awayScore = Number(away.score?.value ?? away.score);
+          if (!homeStats || !awayStats || !Number.isFinite(homeScore) || !Number.isFinite(awayScore)) return;
+          homeStats.played++;
+          awayStats.played++;
+          homeStats.goalsFor += homeScore;
+          homeStats.goalsAgainst += awayScore;
+          awayStats.goalsFor += awayScore;
+          awayStats.goalsAgainst += homeScore;
+          if (homeScore > awayScore) {
+            homeStats.wins++;
+            homeStats.points += 3;
+            awayStats.losses++;
+          } else if (awayScore > homeScore) {
+            awayStats.wins++;
+            awayStats.points += 3;
+            homeStats.losses++;
+          } else {
+            homeStats.draws++;
+            awayStats.draws++;
+            homeStats.points++;
+            awayStats.points++;
+          }
+        });
+        if ([...totals.values()].some(stats => stats.played === 0)) {
+          throw new Error("Faltan resultados para uno o más clubes; se mantiene la última tabla disponible.");
+        }
+        Object.values(ecuadorStandings).forEach(group => {
+          group.rows = group.rows.map(row => {
+            const stats = totals.get(String(ecuadorTeamIds[row.club]));
+            return {
+              ...row,
+              ...stats,
+              goalDifference: stats.goalsFor - stats.goalsAgainst
+            };
+          }).sort((first, second) =>
+            second.points - first.points ||
+            second.goalDifference - first.goalDifference ||
+            second.goalsFor - first.goalsFor ||
+            first.club.localeCompare(second.club, "es")
+          ).map((row, index) => ({ ...row, rank: index + 1 }));
+        });
+        ecuadorStandingsState.updatedAt = new Date();
+        ecuadorStandingsState.error = "";
+      } catch (error) {
+        ecuadorStandingsState.error = error instanceof Error
+          ? error.message
+          : "Error inesperado al consultar los resultados.";
+      }
+      renderTeams();
+      renderDetail();
+      renderPredictionMatches();
     }
 
     function renderTeams() {
@@ -1028,11 +1388,19 @@
             <div class="mini-panel"><h3>Fuente y actualización</h3><a class="text-link" href="https://ligapro.ec/" target="_blank" rel="noopener noreferrer">LigaPro · tabla oficial ↗</a><p class="stat-caption" style="margin-top:11px">Consultada el 28 de octubre de 2026. No es una conexión en vivo.</p></div>
           </div>`;
       } else if (state.panel === "partidos") {
-        detailContent.innerHTML = `<div class="mini-panel"><h3>Próximos partidos</h3><p class="second-note">La tabla de LigaPro consultada confirma la posición del equipo, pero no incluye aquí el calendario verificado de sus próximos encuentros. Para evitar mostrar fechas ni rivales inventados, revisa la <a class="text-link" href="https://ligapro.ec/" target="_blank" rel="noopener noreferrer">programación oficial de LigaPro</a>.</p></div>`;
+        detailContent.innerHTML = `<div class="mini-panel"><h3>Calendario de ${escapeHtml(club[0])} · LigaPro Serie A</h3>${renderClubSchedule(club)}</div>`;
       } else {
         const stadium = stadiums[club[0]] || [`Estadio local de ${club[3]}`, "Capacidad y sede por confirmar con la asociación provincial"];
         detailContent.innerHTML = `<div class="stadium-block"><div class="stadium-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 9.5 12 4l9 5.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5v-9Z"/><path d="M7 20v-6h10v6M7 10h.01M12 10h.01M17 10h.01"/></svg></div><div><h3>${stadium[0]}</h3><p>${stadium[1]}</p></div></div><p class="second-note">La sede o capacidad puede variar; verifica los datos con el club organizador.</p>`;
       }
+      const retrySchedule = detailContent.querySelector("#retry-club-schedule");
+      if (retrySchedule) retrySchedule.addEventListener("click", () => {
+        const teamId = ecuadorTeamIds[state.club[0]];
+        clubSchedules.delete(teamId);
+        ecuadorSchedulePromise = null;
+        renderDetail();
+      });
+      attachLogoFallbacks(detailContent);
     }
 
     function escapeHtml(value) {
@@ -1041,8 +1409,83 @@
       })[character]);
     }
 
+    const clubSchedules = new Map();
+    let ecuadorSchedulePromise;
+
+    function renderClubSchedule(club) {
+      const teamId = ecuadorTeamIds[club[0]];
+      if (!teamId) return '<p class="second-note">No se encontró el identificador de este equipo para consultar el calendario.</p>';
+      const schedule = clubSchedules.get(teamId);
+      if (!schedule) {
+        clubSchedules.set(teamId, { loading: true, events: [], error: "" });
+        fetchClubSchedule(teamId);
+        return '<p class="second-note">Cargando el calendario del equipo…</p>';
+      }
+      if (schedule.loading) return '<p class="second-note">Cargando el calendario del equipo…</p>';
+      if (schedule.error) {
+        return `<p class="second-note">${escapeHtml(schedule.error)}</p><button class="button secondary" id="retry-club-schedule" type="button">Reintentar</button>`;
+      }
+      const events = schedule.events
+        .filter(event => {
+          const kickoff = new Date(event.date).getTime();
+          const status = event.competitions?.[0]?.status?.type;
+          return Number.isFinite(kickoff) && kickoff >= Date.now() &&
+            status?.completed !== true &&
+            !/abandon|cancel|postpon|suspend|forfeit/i.test(status?.name || "");
+        })
+        .sort((first, second) => new Date(first.date) - new Date(second.date));
+      const teamEvents = events.filter(event =>
+        event.competitions?.[0]?.competitors?.some(competitor =>
+          String(competitor.team?.id || competitor.id) === teamId
+        )
+      );
+      return teamEvents.length
+        ? `<div class="fixture-list">${teamEvents.map(event => renderFixtureEvent(event, event.league?.name || "LigaPro Serie A")).join("")}</div><p class="second-note">Calendario consultado en ESPN · horas de Ecuador.</p>`
+        : '<p class="second-note">No hay próximos partidos publicados para este equipo en LigaPro Serie A.</p>';
+    }
+
+    async function fetchClubSchedule(teamId) {
+      try {
+        if (!ecuadorSchedulePromise) {
+          const year = new Date().getFullYear();
+          ecuadorSchedulePromise = fetchJson(`${soccerApi}/ecu.1/scoreboard?dates=${year}&limit=1000`)
+            .then(payload => {
+              if (!Array.isArray(payload.events)) throw new Error("ESPN no publicó el calendario de LigaPro.");
+              return payload.events;
+            });
+        }
+        const events = await ecuadorSchedulePromise;
+        if (!events.some(event => event.competitions?.[0]?.competitors?.some(competitor =>
+          String(competitor.team?.id || competitor.id) === teamId
+        ))) {
+          throw new Error("No se encontraron partidos publicados para este equipo.");
+        }
+        clubSchedules.set(teamId, { loading: false, events, error: "" });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Error inesperado al consultar el calendario.";
+        ecuadorSchedulePromise = null;
+        clubSchedules.set(teamId, { loading: false, events: [], error: `No se pudo cargar el calendario. ${message}` });
+      }
+      if (state.panel === "partidos" && ecuadorTeamIds[state.club[0]] === teamId) renderDetail();
+    }
+
+    function renderFixtureEvent(event, competitionName) {
+      const competitors = event.competitions?.[0]?.competitors || [];
+      const home = competitors.find(team => team.homeAway === "home") || competitors[0];
+      const away = competitors.find(team => team.homeAway === "away") || competitors.find(team => team !== home);
+      if (!home || !away) return "";
+      const formatTeam = competitor => ({
+        name: competitor.team?.displayName || competitor.team?.name || competitor.displayName || competitor.name || "Equipo",
+        abbreviation: competitor.team?.abbreviation || competitor.abbreviation || "",
+        logo: competitor.team?.logo || competitor.logo || competitor.team?.logos?.[0]?.href || ""
+      });
+      const homeTeam = formatTeam(home);
+      const awayTeam = formatTeam(away);
+      return `<div class="fixture-entry"><span class="fixture-competition">${escapeHtml(competitionName)}</span><div class="fixture-row"><span class="fixture-side">${logoMarkup(homeTeam)}<span>${escapeHtml(homeTeam.name)}</span></span><span class="fixture-time">${escapeHtml(formatMatchDate(event.date))}</span><span class="fixture-side">${logoMarkup(awayTeam)}<span>${escapeHtml(awayTeam.name)}</span></span></div></div>`;
+    }
+
     async function fetchJson(url) {
-      const response = await fetch(url);
+      const response = await fetch(url, { cache: "no-store" });
       if (!response.ok) throw new Error(`El proveedor respondió ${response.status}.`);
       return response.json();
     }
@@ -1264,12 +1707,14 @@
       renderPlayerFeature();
       renderPlayerRoster();
       renderPlayerProfile();
-      document.getElementById("player-source").textContent = playerState.error
-        ? "Fuente ESPN · algunos datos no disponibles"
+      const source = document.getElementById("player-source");
+      source.textContent = playerState.error || playerRefreshError
+        ? "Fuente ESPN · actualización pendiente"
         : `Fuente ESPN · temporada actual · ${playerTeamName()}`;
+      source.title = playerState.error || playerRefreshError || "Datos consultados de ESPN.";
     }
 
-    async function loadPlayerRoster() {
+    async function loadPlayerRoster({ silent = false } = {}) {
       const competitionId = playerState.competitionId;
       const teamId = playerState.teamId;
       if (!teamId) {
@@ -1282,11 +1727,14 @@
         return;
       }
       const requestId = ++playerState.requestId;
-      playerState.loading = true;
-      playerState.error = "";
-      playerState.roster = [];
-      playerState.selectedPlayerId = null;
-      renderPlayerExplorer();
+      const selectedPlayerId = playerState.pendingPlayerId || playerState.selectedPlayerId;
+      if (!silent) {
+        playerState.loading = true;
+        playerState.error = "";
+        playerState.roster = [];
+        playerState.selectedPlayerId = null;
+        renderPlayerExplorer();
+      }
       const cached = worldState.data.get(competitionId);
       try {
         const [roster, statistics] = await Promise.all([
@@ -1299,16 +1747,25 @@
         if (!Array.isArray(roster.athletes)) throw new Error("ESPN no devolvió una plantilla válida para este equipo.");
         playerState.roster = roster.athletes;
         playerState.statistics = statistics;
-        playerState.selectedPlayerId = playerState.roster.some(player => String(player.id) === playerState.pendingPlayerId)
-          ? playerState.pendingPlayerId
+        playerState.selectedPlayerId = playerState.roster.some(player => String(player.id) === selectedPlayerId)
+          ? selectedPlayerId
           : null;
         playerState.pendingPlayerId = null;
         playerState.loading = false;
+        playerState.error = "";
+        playerRefreshError = "";
         renderPlayerExplorer();
       } catch (error) {
         if (requestId !== playerState.requestId) return;
         playerState.loading = false;
-        playerState.error = error instanceof Error ? error.message : "No se pudo consultar la plantilla.";
+        const message = error instanceof Error ? error.message : "No se pudo consultar la plantilla.";
+        if (silent) {
+          playerRefreshError = message;
+          renderPlayerExplorer();
+          updateFeedStatus();
+          return;
+        }
+        playerState.error = message;
         playerState.pendingPlayerId = null;
         playerState.statistics = cached?.statistics || null;
         renderPlayerExplorer();
@@ -1339,49 +1796,119 @@
       if (playerState.teamId) loadPlayerRoster();
     }
 
-    function renderTriviaCompetitions() {
-      const select = document.getElementById("trivia-competition");
-      if (select.options.length !== playerCompetitions().length) {
-        select.innerHTML = playerCompetitions().map(competition =>
-          `<option value="${competition.id}">${escapeHtml(competition.name)}</option>`
-        ).join("");
+    function shuffleItems(items) {
+      for (let index = items.length - 1; index > 0; index--) {
+        const other = Math.floor(Math.random() * (index + 1));
+        [items[index], items[other]] = [items[other], items[index]];
       }
-      select.value = triviaState.competitionId;
+      return items;
     }
 
-    function triviaRows() {
-      if (triviaState.competitionId === "ecu.1") {
-        return ecuadorStandings[state.group].rows.map((row, index) => ({ id: row.club, name: row.club, rank: index + 1, points: row.points }));
+    function createTriviaQuestion(question, answer, choices, category) {
+      const answerText = String(answer);
+      const uniqueChoices = [...new Set(choices.map(String).filter(choice => choice !== answerText))];
+      if (uniqueChoices.length < 3 && Number.isFinite(Number(answerText))) {
+        for (let offset = 1; uniqueChoices.length < 3; offset++) {
+          for (const distractor of [String(Number(answerText) + offset), String(Math.max(0, Number(answerText) - offset))]) {
+            if (distractor !== answerText && !uniqueChoices.includes(distractor)) uniqueChoices.push(distractor);
+            if (uniqueChoices.length === 3) break;
+          }
+        }
       }
-      return worldState.data.get(triviaState.competitionId)?.table || [];
+      shuffleItems(uniqueChoices);
+      const options = shuffleItems([...uniqueChoices.slice(0, 3), answerText]);
+      return {
+        question,
+        options,
+        answer: options.indexOf(answerText),
+        category
+      };
+    }
+
+    function currentLeagueTriviaQuestions() {
+      const leagueTables = Object.values(ecuadorStandings).map(group => ({
+        name: `LigaPro · ${group.label}`,
+        rows: group.rows.map((row, index) => ({ name: row.club, rank: index + 1, points: row.points }))
+      }));
+      competitions.forEach(competition => {
+        const table = worldState.data.get(competition.id)?.table;
+        if (table?.length) leagueTables.push({ name: competition.name, rows: table });
+      });
+      return leagueTables.filter(league => league.rows.length >= 4).map(league => {
+        const rows = league.rows;
+        if (triviaState.difficulty === "facil") {
+          return createTriviaQuestion(
+            `¿Qué equipo lidera ${league.name}?`,
+            rows[0].name,
+            rows.map(row => row.name),
+            league.name
+          );
+        }
+        if (triviaState.difficulty === "medio") {
+          const team = rows[Math.floor(Math.random() * rows.length)];
+          return createTriviaQuestion(
+            `¿Cuántos puntos tiene ${team.name} en ${league.name}?`,
+            team.points,
+            rows.map(row => row.points).filter(Number.isFinite),
+            league.name
+          );
+        }
+        const team = rows[Math.floor(Math.random() * rows.length)];
+        return createTriviaQuestion(
+          `¿Qué equipo ocupa el puesto #${team.rank} en ${league.name}?`,
+          team.name,
+          rows.map(row => row.name),
+          league.name
+        );
+      });
     }
 
     function renderTrivia() {
-      renderTriviaCompetitions();
-      const rows = triviaRows();
       const question = document.getElementById("quiz-question");
       const options = document.getElementById("quiz-options");
-      if (!rows.length) {
-        question.textContent = worldState.data.get(triviaState.competitionId)?.error
-          ? "No se pudieron cargar los datos de esta liga."
-          : `Cargando la clasificación de ${playerCompetitionName(triviaState.competitionId)}…`;
+      const progress = document.querySelector(".quiz-progress");
+      document.getElementById("quiz-counter").innerHTML = `Pregunta <strong>${Math.min(triviaState.questionNumber + 1, 10)}</strong> de 10`;
+      document.getElementById("quiz-score").innerHTML = `Puntaje: <strong>${triviaState.score}</strong>`;
+      progress.setAttribute("aria-valuenow", String(triviaState.questionNumber));
+      document.getElementById("quiz-progress-fill").style.width = `${triviaState.questionNumber * 10}%`;
+      if (triviaState.finished) {
+        question.textContent = `¡Ronda completada! Obtuviste ${triviaState.score} de 10 puntos.`;
+        document.getElementById("quiz-league").textContent = "";
         options.innerHTML = "";
+        document.getElementById("quiz-result").textContent = triviaState.score === 10
+          ? "¡Perfecto! Dominas este nivel. ⚽"
+          : triviaState.score >= 7 ? "¡Gran resultado! ¿Te atreves con otro nivel?" : "¡Buen intento! Prueba otra ronda y mejora tu puntaje.";
+        document.getElementById("quiz-next").classList.add("hidden");
         return;
       }
-      const answerIndex = triviaState.questionNumber % Math.min(rows.length, 4);
-      const answer = rows[answerIndex];
-      const choices = rows.slice(0, Math.min(rows.length, 4));
-      for (let index = choices.length - 1; index > 0; index--) {
-        const other = Math.floor(Math.random() * (index + 1));
-        [choices[index], choices[other]] = [choices[other], choices[index]];
-      }
-      triviaState.answer = answer;
-      question.textContent = `¿Qué equipo ocupa el puesto #${answerIndex + 1} en ${playerCompetitionName(triviaState.competitionId)}?`;
-      options.innerHTML = choices.map(choice =>
-        `<button type="button" class="quiz-option" data-answer="${choice.id === answer.id ? "correct" : "wrong"}">${escapeHtml(choice.name)}</button>`
+      const currentQuestion = triviaState.questions[triviaState.questionNumber];
+      triviaState.answer = currentQuestion.answer;
+      document.getElementById("quiz-league").textContent = currentQuestion.category || "Cultura general del fútbol";
+      question.textContent = currentQuestion.question;
+      options.innerHTML = currentQuestion.options.map((choice, index) =>
+        `<button type="button" class="quiz-option" data-answer="${index}">${escapeHtml(choice)}</button>`
       ).join("");
       document.getElementById("quiz-result").textContent = "";
       document.getElementById("quiz-next").classList.add("hidden");
+    }
+
+    function startTriviaRound() {
+      const leagueQuestions = currentLeagueTriviaQuestions();
+      document.getElementById("quiz-league-status").textContent =
+        `${leagueQuestions.length} clasificaciones de ligas incluidas`;
+      const generalQuestions = shuffleItems(triviaQuestions[triviaState.difficulty].map(question => {
+        const options = question.options.slice();
+        const answerText = options[question.answer];
+        shuffleItems(options);
+        return { ...question, options, answer: options.indexOf(answerText), category: "Cultura general del fútbol" };
+      }));
+      triviaState.questions = shuffleItems([...leagueQuestions, ...generalQuestions.slice(0, Math.max(0, 10 - leagueQuestions.length))]).slice(0, 10);
+      triviaState.questionNumber = 0;
+      triviaState.score = 0;
+      triviaState.answer = null;
+      triviaState.answered = false;
+      triviaState.finished = false;
+      renderTrivia();
     }
 
     function extractJsonObject(source, start) {
@@ -1472,7 +1999,7 @@
     }
 
     async function fetchOfficialStandings(competitionId) {
-      const response = await fetch(`https://www.espn.com/soccer/table/_/league/${encodeURIComponent(competitionId)}`);
+      const response = await fetch(`https://www.espn.com/soccer/table/_/league/${encodeURIComponent(competitionId)}`, { cache: "no-store" });
       if (!response.ok) throw new Error(`La clasificación oficial respondió ${response.status}.`);
       return response.text();
     }
@@ -1561,6 +2088,94 @@
       }).format(new Date(date));
     }
 
+    function renderPredictionMatches() {
+      const competitionId = predictionState.competitionId;
+      const isEcuador = competitionId === "ecu.1";
+      const competition = competitions.find(item => item.id === competitionId);
+      const data = isEcuador ? null : worldState.data.get(competitionId);
+      const events = isEcuador ? predictionState.ecuadorEvents : data?.events || [];
+      const seasonYear = isEcuador ? new Date().getFullYear() : Number(data?.season?.year);
+      const fixtures = events.filter(event => {
+        const kickoff = new Date(event.date).getTime();
+        const match = event.competitions?.[0];
+        const status = match?.status?.type;
+        return Number.isFinite(kickoff) && kickoff >= Date.now() &&
+          (!seasonYear || Number(event.season?.year) === seasonYear) &&
+          status?.completed !== true &&
+          !/abandon|cancel|postpon|suspend|forfeit/i.test(status?.name || "") &&
+          match?.competitors?.length === 2;
+      }).map(event => {
+        const competitors = event.competitions[0].competitors;
+        const home = competitors.find(team => team.homeAway === "home") || competitors[0];
+        const away = competitors.find(team => team.homeAway === "away") || competitors.find(team => team !== home);
+        const teamName = team => team.team?.displayName || team.team?.name || team.displayName || team.name || "Equipo";
+        const eventId = String(event.id || `${home.id}-${away.id}-${event.date}`);
+        return {
+          id: eventId,
+          key: `${competitionId}:${eventId}`,
+          date: event.date,
+          home: teamName(home),
+          away: teamName(away)
+        };
+      }).sort((first, second) => new Date(first.date) - new Date(second.date)).slice(0, 8);
+      const count = [...predictionState.picks.keys()].filter(key => key.startsWith(`${competitionId}:`)).length;
+      const countLabel = document.getElementById("prediction-count");
+      countLabel.textContent = count
+        ? `${count} pronóstico${count === 1 ? "" : "s"} elegido${count === 1 ? "" : "s"} en esta competición`
+        : "Aún no has hecho pronósticos en esta competición.";
+      const list = document.getElementById("prediction-list");
+      if (!fixtures.length) {
+        const loading = isEcuador
+          ? !predictionState.ecuadorEvents.length && !ecuadorStandingsState.error
+          : !data || data.loading;
+        const error = isEcuador
+          ? ecuadorStandingsState.error
+          : data?.error || data?.refreshError;
+        list.innerHTML = loading
+          ? '<div class="prediction-message">Cargando próximos partidos…</div>'
+          : error
+            ? `<div class="prediction-message error">No se pudieron cargar los próximos partidos. ${escapeHtml(error)}</div>`
+            : '<div class="prediction-message">No hay próximos partidos publicados para esta competición.</div>';
+        return;
+      }
+      list.innerHTML = fixtures.map(fixture => {
+        const pick = predictionState.picks.get(fixture.key);
+        const choice = pick === "home" ? `Gana ${fixture.home}` :
+          pick === "away" ? `Gana ${fixture.away}` :
+            pick === "draw" ? "Empate" : "";
+        return `<article class="prediction-match">
+          <div class="prediction-match-heading"><span>${escapeHtml(competition?.name || "LigaPro Serie A")}</span><time>${escapeHtml(formatMatchDate(fixture.date))}</time></div>
+          <div class="prediction-matchup"><span>${escapeHtml(fixture.home)}</span><span class="prediction-vs">VS</span><span>${escapeHtml(fixture.away)}</span></div>
+          <div class="prediction-options" role="group" aria-label="Tu pronóstico para ${escapeHtml(fixture.home)} contra ${escapeHtml(fixture.away)}">
+            <button type="button" data-prediction-match="${escapeHtml(fixture.id)}" data-prediction-outcome="home" aria-label="Gana ${escapeHtml(fixture.home)}" aria-pressed="${pick === "home"}" title="Gana ${escapeHtml(fixture.home)}">1 · Local</button>
+            <button type="button" data-prediction-match="${escapeHtml(fixture.id)}" data-prediction-outcome="draw" aria-label="Empate" aria-pressed="${pick === "draw"}" title="Empate">X · Empate</button>
+            <button type="button" data-prediction-match="${escapeHtml(fixture.id)}" data-prediction-outcome="away" aria-label="Gana ${escapeHtml(fixture.away)}" aria-pressed="${pick === "away"}" title="Gana ${escapeHtml(fixture.away)}">2 · Visita</button>
+          </div>
+          <p class="prediction-choice">${choice ? `Tu pronóstico: ${escapeHtml(choice)}` : "Elige un resultado para este partido."}</p>
+        </article>`;
+      }).join("");
+    }
+
+    function worldTeamFixtures(team) {
+      const fixtures = new Map();
+      competitions.forEach(competition => {
+        const data = worldState.data.get(competition.id);
+        if (!data?.table?.some(entry => entry.id === team.id)) return;
+        data.events.filter(event => {
+          const kickoff = new Date(event.date).getTime();
+          const match = event.competitions?.[0];
+          return Number(event.season?.year) === Number(data.season.year) &&
+            Number.isFinite(kickoff) && kickoff >= Date.now() &&
+            match?.status?.type?.completed !== true &&
+            !/abandon|cancel|postpon|suspend|forfeit/i.test(match?.status?.type?.name || "") &&
+            match.competitors?.some(competitor => String(competitor.team?.id || competitor.id) === team.id);
+        }).forEach(event => fixtures.set(`${competition.id}:${event.id}`, { event, competition }));
+      });
+      return [...fixtures.values()].sort((first, second) =>
+        new Date(first.event.date) - new Date(second.event.date)
+      );
+    }
+
     function renderLeaders(data, key, title) {
       const category = data.statistics.stats?.find(stat => stat.name === key);
       const leaders = category?.leaders?.slice(0, 5) || [];
@@ -1597,17 +2212,7 @@
       const { table, matches, season } = data;
       const selected = table.find(team => team.id === worldState.selectedTeam) || table[0];
       if (selected) worldState.selectedTeam = selected.id;
-      const selectedFixtures = selected ? data.events
-        .filter(event => {
-          const kickoff = new Date(event.date).getTime();
-          const match = event.competitions?.[0];
-          return Number(event.season?.year) === Number(season.year) &&
-            Number.isFinite(kickoff) && kickoff >= Date.now() &&
-            match?.status?.type?.completed !== true &&
-            match.competitors?.some(competitor => competitor.team.id === selected.id);
-        })
-        .sort((first, second) => new Date(first.date) - new Date(second.date))
-        : [];
+      const selectedFixtures = selected ? worldTeamFixtures(selected) : [];
       const top = table[0];
       const caption = competition.id === "uefa.champions" ? `Fase liga · ${data.seasonName}` : `${competition.name} · temporada ${data.seasonName}`;
       const scoreTable = table.length ? table.map((team, index) => `
@@ -1628,20 +2233,13 @@
           </div>`
         : "";
       const fixtureMarkup = selectedFixtures.length
-        ? selectedFixtures.map(event => {
-          const match = event.competitions[0];
-          const home = match.competitors.find(team => team.homeAway === "home") || match.competitors[0];
-          const away = match.competitors.find(team => team !== home);
-          const homeTeam = { name: home.team.displayName, abbreviation: home.team.abbreviation, logo: home.team.logo };
-          const awayTeam = { name: away.team.displayName, abbreviation: away.team.abbreviation, logo: away.team.logo };
-          return `<div class="fixture-row"><span class="fixture-side">${logoMarkup(homeTeam)}<span>${escapeHtml(homeTeam.name)}</span></span><span class="fixture-time">${escapeHtml(formatMatchDate(event.date))}</span><span class="fixture-side">${logoMarkup(awayTeam)}<span>${escapeHtml(awayTeam.name)}</span></span></div>`;
-        }).join("")
-        : '<p class="second-note">No hay próximos partidos publicados para este equipo.</p>';
+        ? selectedFixtures.map(({ event, competition }) => renderFixtureEvent(event, competition.name)).join("")
+        : '<p class="second-note">No hay próximos partidos publicados para este equipo en las competiciones disponibles.</p>';
       const updated = new Date(data.updatedAt);
       document.getElementById("world-updated").textContent = `Consultado ${new Intl.DateTimeFormat("es-EC", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Guayaquil" }).format(updated)} · hora Ecuador`;
       card.innerHTML = `
         <div class="world-card-header">
-          <div><h3>${escapeHtml(caption)}</h3><p>${competition.id === "uefa.champions" ? "36 clubes · clasificación de la fase liga" : `${escapeHtml(competition.country)} · tabla de ${table.length} equipos`}</p></div>
+          <div><h3>${escapeHtml(caption)}</h3><p>${competition.id === "uefa.champions" ? "36 clubes · clasificación de la fase liga" : `${escapeHtml(competition.country)} · tabla de ${table.length} equipos`}</p>${data.refreshError ? `<p class="second-note">No se pudo actualizar: ${escapeHtml(data.refreshError)}. Se muestran los últimos datos disponibles.</p>` : ""}</div>
           <span class="live-source">Fuente: ESPN</span>
         </div>
         <div class="world-summary">
@@ -1657,7 +2255,7 @@
               ${selectedStats}
               ${selected ? `<a class="text-link world-roster-link" href="#jugadores" data-team-id="${escapeHtml(selected.id)}">Abrir plantilla de ${escapeHtml(selected.name)} ↓</a>` : ""}
             </article>
-            <article class="world-detail-card"><h4>Todos los partidos pendientes</h4><div class="fixture-list">${fixtureMarkup}</div></article>
+            <article class="world-detail-card"><h4>Calendario de ${escapeHtml(selected?.name || "este equipo")}</h4><div class="fixture-list">${fixtureMarkup}</div></article>
           </aside>
         </div>
         <div class="world-lower">
@@ -1684,25 +2282,39 @@
     }
 
     async function refreshCompetition(competition) {
-      worldState.data.set(competition.id, { loading: true });
-      renderWorld();
+      if (refreshingCompetitions.has(competition.id)) return;
+      refreshingCompetitions.add(competition.id);
+      const previous = worldState.data.get(competition.id);
+      if (!previous?.table) {
+        worldState.data.set(competition.id, { loading: true });
+        renderWorld();
+      }
       try {
         const data = await loadCompetition(competition);
         worldState.data.set(competition.id, data);
-        if (competition.id === worldState.active) worldState.selectedTeam = data.table[0]?.id || null;
+        if (competition.id === worldState.active &&
+            !data.table.some(team => team.id === worldState.selectedTeam)) {
+          worldState.selectedTeam = data.table[0]?.id || null;
+        }
         renderWorld();
+        if (penaltyState.competitionId === competition.id) renderPenaltySetup();
         if (playerState.competitionId === competition.id && !playerState.teamId) {
           renderPlayerSelectors();
           loadPlayerRoster();
         }
-        if (triviaState.competitionId === competition.id) renderTrivia();
-        updateFeedStatus();
       } catch (error) {
         const message = error instanceof Error ? error.message : "Error inesperado al consultar los datos.";
-        worldState.data.set(competition.id, { error: `${competition.name}: ${message}` });
-        renderWorld();
-        if (triviaState.competitionId === competition.id) renderTrivia();
-        if (playerState.competitionId === competition.id) renderPlayerSelectors();
+        if (previous?.table) {
+          worldState.data.set(competition.id, { ...previous, refreshError: message });
+          renderWorld();
+        } else {
+          worldState.data.set(competition.id, { error: `${competition.name}: ${message}` });
+          renderWorld();
+          if (playerState.competitionId === competition.id) renderPlayerSelectors();
+        }
+      } finally {
+        refreshingCompetitions.delete(competition.id);
+        renderPredictionMatches();
         updateFeedStatus();
       }
     }
@@ -1711,26 +2323,68 @@
       const completed = competitions.filter(item => {
         const result = worldState.data.get(item.id);
         return result?.table || result?.error;
-      }).length;
-      const failed = competitions.filter(item => worldState.data.get(item.id)?.error).length;
+      }).length + (ecuadorStandingsState.updatedAt || ecuadorStandingsState.error ? 1 : 0);
+      const failed = competitions.filter(item => {
+        const result = worldState.data.get(item.id);
+        return result?.error || result?.refreshError;
+      }).length + (newsRefreshError ? 1 : 0) + (playerRefreshError ? 1 : 0) +
+        (ecuadorStandingsState.error ? 1 : 0);
       const status = document.getElementById("feed-status");
-      status.textContent = completed < competitions.length
-        ? `${completed}/${competitions.length} listas`
-        : failed ? `${failed} con error` : `${competitions.length}/${competitions.length} listas`;
+      status.textContent = refreshingCompetitions.size || refreshState.inFlight
+        ? "Actualizando…"
+        : completed < competitions.length
+          ? `${completed}/${competitions.length + 1} listas`
+          : failed ? `${failed} con error` : `${competitions.length + 1}/${competitions.length + 1} listas`;
     }
 
-    async function loadWorldData() {
-      document.getElementById("feed-status").textContent = "Conectando";
+    async function loadWorldData({ newTrivia = false } = {}) {
+      if (refreshState.inFlight) return refreshState.inFlight;
+      refreshState.lastStartedAt = Date.now();
+      const button = document.getElementById("refresh-data");
+      button.disabled = true;
+      button.setAttribute("aria-busy", "true");
+      document.getElementById("feed-status").textContent = "Actualizando…";
       renderCompetitionTabs();
-      await Promise.all([
-        ...competitions.map(refreshCompetition),
-        loadNews()
-      ]);
+      const refresh = (async () => {
+        await Promise.all([
+          ...competitions.map(refreshCompetition),
+          loadNews(),
+          refreshEcuadorStandings()
+        ]);
+        if (playerState.teamId) await loadPlayerRoster({ silent: playerState.roster.length > 0 });
+        if (penaltyState.teamId) {
+          penaltyState.requestId++;
+          penaltyState.playersRequestedForCurrentTeam = false;
+          penaltyState.playersLoading = false;
+          penaltyState.error = "";
+          await loadPenaltyPlayers({ silent: penaltyState.players.length > 0 });
+        }
+        ecuadorSchedulePromise = null;
+        clubSchedules.clear();
+        renderPredictionMatches();
+        if (state.panel === "partidos") renderDetail();
+        if (newTrivia) startTriviaRound();
+        const lastUpdate = new Date();
+        const formatted = new Intl.DateTimeFormat("es-EC", {
+          dateStyle: "medium", timeStyle: "short", timeZone: "America/Guayaquil"
+        }).format(lastUpdate);
+        document.getElementById("world-updated").textContent = `Última consulta ${formatted} · hora Ecuador`;
+        button.title = `Última actualización: ${formatted}. Se actualizará automáticamente cada 5 minutos.`;
+      })();
+      refreshState.inFlight = refresh;
+      try {
+        await refresh;
+      } finally {
+        refreshState.inFlight = null;
+        button.disabled = false;
+        button.removeAttribute("aria-busy");
+        updateFeedStatus();
+      }
     }
 
     async function loadNews() {
       const newsGrid = document.getElementById("news-grid");
-      newsGrid.innerHTML = '<div class="world-message">Cargando titulares…</div>';
+      if (!newsHasLoaded) newsGrid.innerHTML = '<div class="world-message">Cargando titulares…</div>';
       const results = await Promise.allSettled(competitions.map(async competition => {
         const payload = await fetchJson(`${soccerApi}/${competition.id}/news?limit=5`);
         return (payload.articles || []).map(article => ({ ...article, competition }));
@@ -1744,10 +2398,15 @@
         .slice(0, 6);
       const failedSources = results.filter(result => result.status === "rejected").length;
       if (!articles.length) {
-        newsGrid.innerHTML = `<div class="world-message error">No se pudieron cargar noticias desde ESPN.${failedSources ? ` Fallaron ${failedSources} fuentes.` : ""}<br><button class="button secondary world-retry" id="retry-news">Reintentar</button></div>`;
-        document.getElementById("retry-news").addEventListener("click", loadNews);
+        newsRefreshError = `No se pudieron cargar noticias desde ESPN${failedSources ? ` (${failedSources} fuentes fallaron)` : ""}.`;
+        if (!newsHasLoaded) {
+          newsGrid.innerHTML = `<div class="world-message error">${escapeHtml(newsRefreshError)}<br><button class="button secondary world-retry" id="retry-news">Reintentar</button></div>`;
+          document.getElementById("retry-news").addEventListener("click", loadNews);
+        }
         return;
       }
+      newsHasLoaded = true;
+      newsRefreshError = failedSources ? `No se pudieron consultar ${failedSources} fuentes de noticias.` : "";
       newsGrid.innerHTML = articles.map(article => {
         const published = new Date(article.published);
         const image = article.images?.find(item => item.url?.startsWith("https://a.espncdn.com/"))?.url;
@@ -1764,50 +2423,190 @@
             <div class="news-foot"><span>${escapeHtml(new Intl.DateTimeFormat("es-EC", { dateStyle: "medium", timeZone: "America/Guayaquil" }).format(published))}</span><a class="text-link" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">Leer en ESPN ↗</a></div>
           </div>
         </article>`;
-      }).join("") + (failedSources
-        ? `<p class="second-note" style="grid-column:1/-1">No se pudieron consultar ${failedSources} de las ${competitions.length} fuentes de noticias.</p>`
+      }).join("") + (newsRefreshError
+        ? `<p class="second-note" style="grid-column:1/-1">${escapeHtml(newsRefreshError)} Se muestran los titulares disponibles.</p>`
         : "");
+      updateFeedStatus();
+    }
+
+    function renderPenaltySetup() {
+      const competitionSelect = document.getElementById("penalty-competition");
+      const teamSelect = document.getElementById("penalty-team");
+      const playerSelect = document.getElementById("penalty-player");
+      const options = playerCompetitions();
+      if (competitionSelect.options.length !== options.length) {
+        competitionSelect.innerHTML = options.map(competition =>
+          `<option value="${escapeHtml(competition.id)}">${escapeHtml(competition.country)} · ${escapeHtml(competition.name)}</option>`
+        ).join("");
+      }
+      competitionSelect.value = penaltyState.competitionId;
+      const teams = penaltyState.competitionId === "ecu.1"
+        ? clubs.a.map(club => ({ id: ecuadorTeamIds[club[0]], name: club[0] }))
+        : worldState.data.get(penaltyState.competitionId)?.table?.map(team => ({ id: team.id, name: team.name })) || [];
+      teamSelect.innerHTML = teams.length
+        ? teams.map(team => `<option value="${escapeHtml(team.id)}">${escapeHtml(team.name)}</option>`).join("")
+        : `<option value="">${refreshingCompetitions.has(penaltyState.competitionId) ? "Cargando equipos…" : "Equipos no disponibles"}</option>`;
+      if (teams.some(team => team.id === penaltyState.teamId)) {
+        teamSelect.value = penaltyState.teamId;
+      } else {
+        penaltyState.teamId = teams[0]?.id || "";
+        teamSelect.value = penaltyState.teamId;
+      }
+      teamSelect.disabled = !teams.length;
+      const selectedPlayer = penaltyState.players.find(player => String(player.id) === penaltyState.playerId);
+      playerSelect.innerHTML = penaltyState.players.length
+        ? penaltyState.players.map(player => `<option value="${escapeHtml(player.id)}">${escapeHtml(player.displayName || player.fullName || "Jugador")}${player.jersey ? ` · #${escapeHtml(player.jersey)}` : ""}</option>`).join("")
+        : `<option value="">${penaltyState.playersLoading ? "Cargando jugadores…" : penaltyState.error || "Plantilla no disponible"}</option>`;
+      playerSelect.value = penaltyState.playerId;
+      playerSelect.disabled = !penaltyState.players.length || penaltyState.playersLoading;
+      document.getElementById("penalty-team-label").textContent =
+        teams.find(team => team.id === penaltyState.teamId)?.name || "Selecciona un equipo";
+      document.getElementById("penalty-player-label").textContent =
+        selectedPlayer?.displayName || selectedPlayer?.fullName || "Selecciona un jugador";
+      document.getElementById("penalty-level-label").textContent = penaltyDifficulty[penaltyState.difficulty].label;
+      const difficulty = penaltyDifficulty[penaltyState.difficulty];
+      document.getElementById("penalty-difficulty-hint").textContent =
+        `Atajada: ${Math.round(difficulty.anticipation * 100)}% · tiro fuera: ${Math.round(difficulty.missChance * 100)}%`;
+      document.getElementById("penalty-data-status").textContent = penaltyState.error
+        ? `No se pudo actualizar la plantilla: ${penaltyState.error}`
+        : penaltyState.playersLoading ? "Actualizando jugadores…" : "Jugadores consultados a ESPN.";
+      if (penaltyState.error) playerSelect.title = penaltyState.error;
+      else playerSelect.removeAttribute("title");
+      if (penaltyState.teamId && !penaltyState.players.length && !penaltyState.playersLoading &&
+          !penaltyState.error && !penaltyState.playersRequestedForCurrentTeam) {
+        loadPenaltyPlayers();
+      }
+      if (!teams.length && !refreshingCompetitions.has(penaltyState.competitionId) &&
+          penaltyState.competitionId !== "ecu.1") {
+        const competition = competitions.find(item => item.id === penaltyState.competitionId);
+        if (competition) refreshCompetition(competition);
+      }
+    }
+
+    async function loadPenaltyPlayers({ silent = false } = {}) {
+      if (!penaltyState.teamId || penaltyState.playersLoading) return;
+      const requestId = ++penaltyState.requestId;
+      const competitionId = penaltyState.competitionId;
+      const teamId = penaltyState.teamId;
+      const selectedPlayerId = penaltyState.playerId;
+      penaltyState.playersRequestedForCurrentTeam = true;
+      if (!silent) {
+        penaltyState.playersLoading = true;
+        penaltyState.players = [];
+        penaltyState.playerId = "";
+      }
+      penaltyState.error = "";
+      renderPenaltySetup();
+      try {
+        const roster = await fetchJson(`${soccerApi}/${competitionId}/teams/${encodeURIComponent(teamId)}/roster`);
+        if (requestId !== penaltyState.requestId) return;
+        if (!Array.isArray(roster.athletes)) throw new Error("ESPN no publicó una plantilla válida.");
+        penaltyState.players = roster.athletes;
+        penaltyState.playerId = penaltyState.players.some(player => String(player.id) === selectedPlayerId)
+          ? selectedPlayerId
+          : String(penaltyState.players[0]?.id || "");
+        penaltyState.playersLoading = false;
+        if (!penaltyState.players.length) penaltyState.error = "No hay jugadores publicados";
+      } catch (error) {
+        if (requestId !== penaltyState.requestId) return;
+        penaltyState.playersLoading = false;
+        penaltyState.error = error instanceof Error ? error.message : "No se pudo cargar la plantilla.";
+        if (silent && penaltyState.players.length) {
+          renderPenaltySetup();
+          return;
+        }
+      }
+      renderPenaltySetup();
     }
 
     function updatePenaltyScoreboard() {
       document.getElementById("penalty-points").textContent = penaltyState.points;
       document.getElementById("penalty-goals").textContent = penaltyState.goals;
       document.getElementById("penalty-attempts").textContent = penaltyState.attempts;
+      document.getElementById("penalty-saves").textContent = penaltyState.saves;
+      document.getElementById("penalty-misses").textContent = penaltyState.misses;
+      document.getElementById("penalty-streak").textContent = penaltyState.streak;
+      document.getElementById("penalty-round").innerHTML = `Tiro: <strong>${penaltyState.attempts}</strong> / 5`;
     }
 
     function resetPenaltyGame() {
+      penaltyState.roundId++;
       penaltyState.points = 0;
       penaltyState.goals = 0;
+      penaltyState.saves = 0;
+      penaltyState.misses = 0;
       penaltyState.attempts = 0;
+      penaltyState.streak = 0;
+      penaltyState.busy = false;
       document.getElementById("penalty-keeper").className = "keeper center";
       document.getElementById("penalty-ball").className = "ball";
-      document.getElementById("penalty-message").textContent = "Elige dónde patear para comenzar.";
+      document.getElementById("penalty-arena").className = "penalty-arena";
+      const message = document.getElementById("penalty-message");
+      message.classList.remove("is-result");
+      message.textContent = "Elige una dirección para tirar.";
+      document.querySelectorAll(".shot-button[data-shot]").forEach(button => { button.disabled = false; });
       updatePenaltyScoreboard();
     }
 
     function shootPenalty(direction) {
+      if (penaltyState.busy || penaltyState.attempts >= 5 || !penaltyState.teamId || !penaltyState.playerId) return;
       const keeperDirections = ["left", "center", "right"];
-      const keeperDirection = keeperDirections[Math.floor(Math.random() * keeperDirections.length)];
+      const difficulty = penaltyDifficulty[penaltyState.difficulty];
+      const anticipates = Math.random() < difficulty.anticipation;
+      const availableDirections = keeperDirections.filter(candidate => candidate !== direction);
+      const keeperDirection = anticipates
+        ? direction
+        : availableDirections[Math.floor(Math.random() * availableDirections.length)];
       const keeper = document.getElementById("penalty-keeper");
       const ball = document.getElementById("penalty-ball");
       const message = document.getElementById("penalty-message");
+      const arena = document.getElementById("penalty-arena");
+      const roundId = penaltyState.roundId;
+      const player = penaltyState.players.find(item => String(item.id) === penaltyState.playerId);
+      const playerName = player?.displayName || player?.fullName || "Tu jugador";
+      const missed = Math.random() < difficulty.missChance;
+      const saved = !missed && keeperDirection === direction;
+      penaltyState.busy = true;
+      arena.className = "penalty-arena is-shooting";
+      message.classList.remove("is-result");
       document.querySelectorAll(".shot-button[data-shot]").forEach(button => { button.disabled = true; });
       keeper.className = `keeper ${keeperDirection}`;
       ball.className = "ball";
       void ball.offsetWidth;
-      ball.classList.add(`shot-${direction}`);
+      ball.classList.add(`shot-${direction}${missed ? "-miss" : ""}`);
       penaltyState.attempts++;
-      const goal = direction !== keeperDirection;
+      const goal = !missed && !saved;
+      let resultMessage;
       if (goal) {
+        const bonus = Math.min(penaltyState.streak, 3) * 5;
         penaltyState.goals++;
-        penaltyState.points += 10;
-        message.textContent = "¡GOLAZO! +10 puntos ficticios. No tienen valor monetario. ⚽";
+        penaltyState.streak++;
+        penaltyState.points += difficulty.points + bonus;
+        resultMessage = `¡GOL de ${playerName}! +${difficulty.points + bonus} puntos${bonus ? " · racha incluida" : ""}.`;
+      } else if (missed) {
+        penaltyState.misses++;
+        penaltyState.streak = 0;
+        resultMessage = `¡El tiro de ${playerName} se fue fuera!`;
       } else {
-        message.textContent = "¡Atajado! Prueba otra dirección; no pierdes puntos.";
+        penaltyState.saves++;
+        penaltyState.streak = 0;
+        resultMessage = `¡Atajado! El arquero tapó el tiro de ${playerName}.`;
       }
       updatePenaltyScoreboard();
       setTimeout(() => {
-        document.querySelectorAll(".shot-button[data-shot]").forEach(button => { button.disabled = false; });
+        if (roundId !== penaltyState.roundId) return;
+        penaltyState.busy = false;
+        arena.className = `penalty-arena ${goal ? "is-goal" : "is-save"}`;
+        if (penaltyState.attempts >= 5) {
+          const goalsLabel = penaltyState.goals === 1 ? "gol" : "goles";
+          const savesLabel = penaltyState.saves === 1 ? "atajada" : "atajadas";
+          const missesLabel = penaltyState.misses === 1 ? "tiro fuera" : "tiros fuera";
+          message.textContent = `${resultMessage} Tanda terminada: ${penaltyState.goals} ${goalsLabel} · ${penaltyState.saves} ${savesLabel} · ${penaltyState.misses} ${missesLabel} · ${penaltyState.points} puntos.`;
+          message.classList.add("is-result");
+        } else {
+          message.textContent = resultMessage;
+          document.querySelectorAll(".shot-button[data-shot]").forEach(button => { button.disabled = false; });
+        }
       }, 650);
     }
 
@@ -1815,7 +2614,6 @@
       state.group = tab.dataset.group;
       renderStandings();
       renderTeams();
-      if (triviaState.competitionId === "ecu.1") renderTrivia();
     }));
     document.querySelectorAll(".detail-tab").forEach(tab => tab.addEventListener("click", () => {
       state.panel = tab.dataset.panel;
@@ -1842,33 +2640,87 @@
       renderPlayerRoster();
       renderPlayerProfile();
     });
-    document.getElementById("trivia-competition").addEventListener("change", event => {
-      triviaState.competitionId = event.currentTarget.value;
-      triviaState.questionNumber = 0;
-      renderTrivia();
+    document.getElementById("trivia-difficulty").addEventListener("change", event => {
+      triviaState.difficulty = event.currentTarget.value;
+      startTriviaRound();
+    });
+    document.getElementById("quiz-restart").addEventListener("click", startTriviaRound);
+    document.getElementById("refresh-data").addEventListener("click", () => loadWorldData({ newTrivia: true }));
+    window.setInterval(() => {
+      if (!document.hidden) loadWorldData();
+    }, refreshState.intervalMs);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && Date.now() - refreshState.lastStartedAt >= refreshState.intervalMs) {
+        loadWorldData();
+      }
     });
 
-    document.getElementById("menu-button").addEventListener("click", event => {
-      const nav = document.getElementById("main-nav");
-      const open = nav.classList.toggle("open");
-      event.currentTarget.setAttribute("aria-expanded", String(open));
+    const mainNav = document.getElementById("main-nav");
+    const menuButton = document.getElementById("menu-button");
+    function closeMainMenu() {
+      mainNav.classList.remove("open");
+      menuButton.setAttribute("aria-expanded", "false");
+      menuButton.setAttribute("aria-label", "Abrir menú de opciones");
+    }
+    menuButton.addEventListener("click", () => {
+      const open = mainNav.classList.toggle("open");
+      menuButton.setAttribute("aria-expanded", String(open));
+      menuButton.setAttribute("aria-label", open ? "Cerrar menú de opciones" : "Abrir menú de opciones");
     });
-    document.querySelectorAll("#main-nav a").forEach(link => link.addEventListener("click", () => {
-      document.getElementById("main-nav").classList.remove("open");
-      document.getElementById("menu-button").setAttribute("aria-expanded", "false");
-    }));
+    document.querySelectorAll("#main-nav a").forEach(link => link.addEventListener("click", closeMainMenu));
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".menu-wrap")) closeMainMenu();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && mainNav.classList.contains("open")) {
+        closeMainMenu();
+        menuButton.focus();
+      }
+    });
+    const predictionCompetition = document.getElementById("prediction-competition");
+    predictionCompetition.innerHTML = [
+      { id: "ecu.1", name: "LigaPro Serie A · Ecuador" },
+      ...competitions.map(item => ({ id: item.id, name: item.name }))
+    ].map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`).join("");
+    predictionCompetition.value = predictionState.competitionId;
+    predictionCompetition.addEventListener("change", event => {
+      predictionState.competitionId = event.currentTarget.value;
+      renderPredictionMatches();
+    });
+    document.getElementById("prediction-list").addEventListener("click", event => {
+      const button = event.target.closest("button[data-prediction-match]");
+      if (!button) return;
+      predictionState.picks.set(
+        `${predictionState.competitionId}:${button.dataset.predictionMatch}`,
+        button.dataset.predictionOutcome
+      );
+      renderPredictionMatches();
+    });
+    renderPredictionMatches();
     document.getElementById("quiz-options").addEventListener("click", event => {
       const option = event.target.closest(".quiz-option");
-      if (!option) return;
-      document.querySelectorAll(".quiz-option").forEach(button => { button.disabled = true; });
-      const correct = option.dataset.answer === "correct";
+      if (!option || triviaState.answered || triviaState.finished) return;
+      triviaState.answered = true;
+      const correct = Number(option.dataset.answer) === triviaState.answer;
+      if (correct) triviaState.score++;
+      document.querySelectorAll(".quiz-option").forEach((button, index) => {
+        button.disabled = true;
+        if (index === triviaState.answer) button.classList.add("correct");
+      });
+      if (!correct) option.classList.add("incorrect");
+      const answerLabel = document.querySelectorAll(".quiz-option")[triviaState.answer].textContent;
+      document.getElementById("quiz-score").innerHTML = `Puntaje: <strong>${triviaState.score}</strong>`;
       document.getElementById("quiz-result").textContent = correct
-        ? `¡Correcto! ${triviaState.answer.name} ocupa el puesto #${triviaState.answer.rank}. ⚽`
-        : `La respuesta era ${triviaState.answer.name}, en el puesto #${triviaState.answer.rank}. ¡Prueba otra!`;
+        ? "¡Correcto! Sumaste un punto. ⚽"
+        : `La respuesta correcta era: ${answerLabel}.`;
+      document.getElementById("quiz-next").textContent = triviaState.questionNumber === 9 ? "Ver resultado" : "Siguiente pregunta";
       document.getElementById("quiz-next").classList.remove("hidden");
     });
     document.getElementById("quiz-next").addEventListener("click", () => {
+      if (!triviaState.answered) return;
       triviaState.questionNumber++;
+      if (triviaState.questionNumber >= 10) triviaState.finished = true;
+      triviaState.answered = false;
       renderTrivia();
     });
     document.getElementById("penalty-controls").addEventListener("click", event => {
@@ -1876,13 +2728,113 @@
       if (shot) shootPenalty(shot.dataset.shot);
       if (event.target.closest("#penalty-reset")) resetPenaltyGame();
     });
+    document.getElementById("penalty-competition").addEventListener("change", event => {
+      penaltyState.competitionId = event.currentTarget.value;
+      penaltyState.teamId = penaltyState.competitionId === "ecu.1" ? ecuadorTeamIds[clubs.a[0][0]] : "";
+      penaltyState.players = [];
+      penaltyState.playerId = "";
+      penaltyState.error = "";
+      penaltyState.playersRequestedForCurrentTeam = false;
+      penaltyState.requestId++;
+      resetPenaltyGame();
+      renderPenaltySetup();
+    });
+    document.getElementById("penalty-team").addEventListener("change", event => {
+      penaltyState.teamId = event.currentTarget.value;
+      penaltyState.players = [];
+      penaltyState.playerId = "";
+      penaltyState.error = "";
+      penaltyState.playersRequestedForCurrentTeam = false;
+      penaltyState.requestId++;
+      resetPenaltyGame();
+      renderPenaltySetup();
+    });
+    document.getElementById("penalty-player").addEventListener("change", event => {
+      penaltyState.playerId = event.currentTarget.value;
+      resetPenaltyGame();
+      renderPenaltySetup();
+    });
+    document.getElementById("penalty-difficulty").addEventListener("change", event => {
+      penaltyState.difficulty = event.currentTarget.value;
+      resetPenaltyGame();
+      renderPenaltySetup();
+    });
 
     renderTeams();
     renderDetail();
     renderPlayerSelectors();
-    renderTrivia();
+    renderPenaltySetup();
+    startTriviaRound();
     loadPlayerRoster();
-    loadWorldData();
+    loadWorldData({ newTrivia: true });
+
+    let installPrompt = null;
+    let toastTimer = 0;
+    const installButton = document.getElementById("install-app");
+    const shareButton = document.getElementById("share-app");
+    const toast = document.getElementById("toast");
+    function showToast(message) {
+      window.clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.remove("hidden");
+      toastTimer = window.setTimeout(() => toast.classList.add("hidden"), 7000);
+    }
+
+    window.addEventListener("beforeinstallprompt", event => {
+      event.preventDefault();
+      installPrompt = event;
+    });
+    installButton.addEventListener("click", async () => {
+      if (installPrompt) {
+        const promptEvent = installPrompt;
+        installPrompt = null;
+        await promptEvent.prompt();
+        const choice = await promptEvent.userChoice;
+        showToast(choice.outcome === "accepted"
+          ? "Fútbol Mundo se está instalando en tu dispositivo."
+          : "Puedes instalar Fútbol Mundo más tarde desde el menú del navegador.");
+      } else if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !navigator.standalone) {
+        showToast("En Safari: pulsa Compartir y elige «Añadir a pantalla de inicio».");
+      } else if (!window.isSecureContext) {
+        showToast("Para instalarla, abre Fútbol Mundo desde una dirección HTTPS.");
+      } else {
+        showToast("Abre el menú de tu navegador y selecciona «Instalar aplicación» o «Añadir a pantalla de inicio».");
+      }
+    });
+    shareButton.addEventListener("click", async () => {
+      const shareUrl = new URL("./", location.href).href;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: "Fútbol Mundo",
+            text: "Sigue el fútbol y disfruta de Fútbol Mundo.",
+            url: shareUrl
+          });
+        } catch (error) {
+          if (error instanceof DOMException && error.name === "AbortError") return;
+          console.error("No se pudo compartir Fútbol Mundo.", error);
+          showToast("No se pudo abrir el menú para compartir. Copia el enlace desde la barra del navegador.");
+        }
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast("Enlace copiado. ¡Envíalo a quien quieras!");
+      } catch (error) {
+        console.error("No se pudo copiar el enlace de Fútbol Mundo.", error);
+        showToast(`Copia este enlace para compartir la app: ${shareUrl}`);
+      }
+    });
+    window.addEventListener("appinstalled", () => {
+      installPrompt = null;
+      showToast("Fútbol Mundo quedó instalada. ¡Disfrútala!");
+    });
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js")
+          .catch(error => console.error("No se pudo registrar el modo sin conexión de Fútbol Mundo.", error));
+      });
+    }
   </script>
 </body>
 </html>
