@@ -401,6 +401,10 @@
     .keeper.left { left: 27%; transform: translateX(-50%) rotate(-18deg); }
     .keeper.center { left: 50%; transform: translateX(-50%); }
     .keeper.right { left: 73%; transform: translateX(-50%) rotate(18deg); }
+    .penalty-arena.is-shooting .keeper.is-saving { z-index: 3; filter: drop-shadow(0 3px 8px rgba(255,116,104,.8)); }
+    .keeper.left.is-saving { transform: translateX(-50%) rotate(-55deg) scale(1.2); }
+    .keeper.center.is-saving { transform: translateX(-50%) scale(1.2); }
+    .keeper.right.is-saving { transform: translateX(-50%) rotate(55deg) scale(1.2); }
     .ball { position: absolute; z-index: 2; top: 148px; left: 50%; font-size: 21px; opacity: 0; transform: translate(-50%, 0); }
     .ball.shot-left { animation: shot-left .55s ease-out forwards; }
     .ball.shot-center { animation: shot-center .55s ease-out forwards; }
@@ -408,12 +412,18 @@
     .ball.shot-miss-left { animation: shot-miss-left .55s ease-out forwards; }
     .ball.shot-miss-center { animation: shot-miss-center .55s ease-out forwards; }
     .ball.shot-miss-right { animation: shot-miss-right .55s ease-out forwards; }
+    .ball.shot-saved-left { animation: shot-saved-left .55s ease-out forwards; }
+    .ball.shot-saved-center { animation: shot-saved-center .55s ease-out forwards; }
+    .ball.shot-saved-right { animation: shot-saved-right .55s ease-out forwards; }
     @keyframes shot-left { to { top: 66px; left: 31%; transform: translate(-50%,-50%) scale(.65); opacity: 1; } }
     @keyframes shot-center { to { top: 65px; left: 50%; transform: translate(-50%,-50%) scale(.65); opacity: 1; } }
     @keyframes shot-right { to { top: 66px; left: 69%; transform: translate(-50%,-50%) scale(.65); opacity: 1; } }
     @keyframes shot-miss-left { to { top: 29px; left: 12%; transform: translate(-50%,-50%) scale(.7) rotate(-35deg); opacity: 1; } }
     @keyframes shot-miss-center { to { top: 2px; left: 50%; transform: translate(-50%,-50%) scale(.7); opacity: 1; } }
     @keyframes shot-miss-right { to { top: 29px; left: 88%; transform: translate(-50%,-50%) scale(.7) rotate(35deg); opacity: 1; } }
+    @keyframes shot-saved-left { to { top: 96px; left: 31%; transform: translate(-50%,-50%) scale(.8); opacity: 1; } }
+    @keyframes shot-saved-center { to { top: 96px; left: 50%; transform: translate(-50%,-50%) scale(.8); opacity: 1; } }
+    @keyframes shot-saved-right { to { top: 96px; left: 69%; transform: translate(-50%,-50%) scale(.8); opacity: 1; } }
     .penalty-scoreboard { display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 13px; background: rgba(255,255,255,.025); }
     .penalty-scoreboard span { color: var(--muted); font-size: 9px; }
     .penalty-scoreboard strong { font-size: 23px; letter-spacing: -.04em; }
@@ -2570,10 +2580,13 @@
       arena.className = "penalty-arena is-shooting";
       message.classList.remove("is-result");
       document.querySelectorAll(".shot-button[data-shot]").forEach(button => { button.disabled = true; });
-      keeper.className = `keeper ${keeperDirection}`;
+      keeper.className = `keeper ${keeperDirection}${saved ? " is-saving" : ""}`;
       ball.className = "ball";
       void ball.offsetWidth;
-      ball.classList.add(`shot-${direction}${missed ? "-miss" : ""}`);
+      const shotAnimation = missed
+        ? `shot-miss-${direction}`
+        : saved ? `shot-saved-${direction}` : `shot-${direction}`;
+      ball.classList.add(shotAnimation);
       penaltyState.attempts++;
       const goal = !missed && !saved;
       let resultMessage;
